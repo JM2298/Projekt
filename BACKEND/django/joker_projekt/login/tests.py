@@ -18,7 +18,7 @@ class LoginAPITestCase(APITestCase):
     def test_login_returns_jwt_tokens(self):
         response = self.client.post(
             self.url,
-            {"username": "testuser", "password": "strong-password"},
+            {"email": "test@example.com", "password": "strong-password"},
             format="json",
         )
 
@@ -39,7 +39,7 @@ class LoginAPITestCase(APITestCase):
     def test_login_with_invalid_credentials_fails(self):
         response = self.client.post(
             self.url,
-            {"username": "testuser", "password": "wrong"},
+            {"email": "test@example.com", "password": "wrong"},
             format="json",
         )
 
