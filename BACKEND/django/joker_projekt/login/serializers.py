@@ -1,4 +1,6 @@
 from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -66,6 +68,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password")
         user_model = self.Meta.model
         user = user_model(**validated_data)
+
+        try:
+            validate_password(password, user)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"password": list(exc.messages)}) from exc
+
         user.set_password(password)
         user.save()
         return user
