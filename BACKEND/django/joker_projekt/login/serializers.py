@@ -8,21 +8,26 @@ from rest_framework import serializers
 class LoginSerializer(serializers.Serializer):
     """Serializer used to validate login credentials."""
 
-    username = serializers.CharField()
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True, style={"input_type": "password"})
 
     def validate(self, attrs):
-        username = attrs.get("username")
+        email = attrs.get("email")
         password = attrs.get("password")
 
-        if username and password:
-            user = authenticate(
-                request=self.context.get("request"),
-                username=username,
-                password=password,
-            )
+        if email and password:
+            user_model = get_user_model()
+            user = user_model.objects.filter(email__iexact=email).first()
+
+            if user:
+                username_field = user_model.USERNAME_FIELD
+                user = authenticate(
+                    request=self.context.get("request"),
+                    username=getattr(user, username_field),
+                    password=password,
+                )
         else:
-            msg = _("Username and password are required.")
+            msg = _("Email and password are required.")
             raise serializers.ValidationError(msg, code="authorization")
 
         if not user:
