@@ -46,3 +46,39 @@ class LoginAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertNotIn("access", response.data)
         self.assertNotIn("refresh", response.data)
+
+
+class RegisterAPITestCase(APITestCase):
+    def setUp(self):
+        self.url = reverse("login:register")
+
+    def test_register_requires_email(self):
+        response = self.client.post(
+            self.url,
+            {
+                "username": "newuser",
+                "password": "strong-password",
+                "password_confirm": "strong-password",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("email", response.data)
+
+    def test_register_with_email_succeeds(self):
+        response = self.client.post(
+            self.url,
+            {
+                "username": "anotheruser",
+                "email": "another@example.com",
+                "password": "strong-password",
+                "password_confirm": "strong-password",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            get_user_model().objects.filter(username="anotheruser").exists()
+        )
