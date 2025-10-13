@@ -26,11 +26,11 @@ ENV C_INCLUDE_PATH=/usr/include/gdal
 # 4. Ustawienia dla Proj
 WORKDIR /code
 COPY requirements.txt ./
-RUN pip install --upgrade pip & pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 8000
 
 #RUN python3 BACKEND/django/joker_projekt/manage.py collectstatic --noinput
 
 
-CMD ["gunicorn", "joker_projekt.asgi:application", "--workers", "4", "--bind", "0.0.0:8000", "--log-level", "info"]
+CMD ["gunicorn", "joker_projekt.asgi:application", "--workers", "4", "--bind", "0.0.0.0:8000", "--log-level", "info"]
