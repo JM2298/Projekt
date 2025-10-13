@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -29,3 +29,43 @@ class LoginSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    """Serializer used to register new users."""
+
+    password = serializers.CharField(
+        write_only=True,
+        style={"input_type": "password"},
+    )
+    password_confirm = serializers.CharField(
+        write_only=True,
+        style={"input_type": "password"},
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ("username", "email", "password", "password_confirm")
+
+    def validate_username(self, value):
+        user_model = self.Meta.model
+        if user_model.objects.filter(username=value).exists():
+            raise serializers.ValidationError(_("A user with that username already exists."))
+        return value
+
+    def validate(self, attrs):
+        password = attrs.get("password")
+        password_confirm = attrs.pop("password_confirm", None)
+
+        if password != password_confirm:
+            raise serializers.ValidationError({"password_confirm": _("Passwords do not match.")})
+
+        return attrs
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        user_model = self.Meta.model
+        user = user_model(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
