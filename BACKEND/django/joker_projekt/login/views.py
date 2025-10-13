@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import LoginSerializer
+from .serializers import LoginSerializer, RegisterSerializer
 
 
 class LoginAPIView(APIView):
@@ -23,3 +23,15 @@ class LoginAPIView(APIView):
             {"access": str(refresh.access_token), "refresh": str(refresh)},
             status=status.HTTP_200_OK,
         )
+
+
+class RegisterAPIView(APIView):
+    """API endpoint that allows users to register a new account."""
+
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
