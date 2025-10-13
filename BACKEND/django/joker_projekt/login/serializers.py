@@ -17,7 +17,15 @@ class LoginSerializer(serializers.Serializer):
 
         if email and password:
             user_model = get_user_model()
-            user = user_model.objects.filter(email__iexact=email).first()
+            users = user_model.objects.filter(email__iexact=email)
+
+            if users.count() > 1:
+                msg = _(
+                    "Multiple accounts are associated with this email. Please log in using your username."
+                )
+                raise serializers.ValidationError(msg, code="authorization")
+
+            user = users.first()
 
             if user:
                 username_field = user_model.USERNAME_FIELD
@@ -53,6 +61,14 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ("username", "email", "password", "password_confirm")
+
+    def validate_email(self, value):
+        user_model = self.Meta.model
+        if user_model.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError(
+                _("A user with that email address already exists.")
+            )
+        return value
 
     def validate_username(self, value):
         user_model = self.Meta.model
