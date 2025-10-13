@@ -28,7 +28,7 @@ services:
       context: .
       dockerfile: Dockerfile
 
-    working_dir: /code/django/joker_projekt  # <-- ustawiamy working directory na katalog projektu Django
+    working_dir: /code/BACKEND/django/joker_projekt  # ustawiamy katalog projektu Django
     # ➜ uruchamiamy collectstatic przed Gunicorn-em
     command:
       - sh
@@ -53,7 +53,7 @@ services:
     volumes:
       - .:/code:rw                         # kod źródłowy
       - ./BACKEND/django/joker_projekt/static:/static  # pliki statyczne trafiają tu
-      - ./media:/code/django/joker_projekt/media  # uploady trafiają do katalogu media
+      - ./media:/code/BACKEND/django/joker_projekt/media  # uploady trafiają do katalogu media
     ports:
       - "8000:8000"
     healthcheck:
