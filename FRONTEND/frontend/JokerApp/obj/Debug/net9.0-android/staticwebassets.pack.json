@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\Programowanie\\Projekty\\Front\\FRONTEND\\frontend\\JokerApp\\obj\\Debug\\net9.0-android\\scopedcss\\bundle\\JokerApp.styles.css",
+      "PackagePath": "staticwebassets\\JokerApp.styles.css"
+    },
+    {
+      "Id": "D:\\Programowanie\\Projekty\\Front\\FRONTEND\\frontend\\JokerApp\\wwwroot\\css\\app.css",
+      "PackagePath": "staticwebassets\\css\\app.css"
+    },
+    {
+      "Id": "D:\\Programowanie\\Projekty\\Front\\FRONTEND\\frontend\\JokerApp\\wwwroot\\css\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "D:\\Programowanie\\Projekty\\Front\\FRONTEND\\frontend\\JokerApp\\wwwroot\\css\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "D:\\Programowanie\\Projekty\\Front\\FRONTEND\\frontend\\JokerApp\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0-android\\staticwebassets\\msbuild.JokerApp.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0-android\\staticwebassets\\msbuild.JokerApp.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0-android\\staticwebassets\\msbuild.build.JokerApp.props",
+      "PackagePath": "build\\JokerApp.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0-android\\staticwebassets\\msbuild.buildMultiTargeting.JokerApp.props",
+      "PackagePath": "buildMultiTargeting\\JokerApp.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0-android\\staticwebassets\\msbuild.buildTransitive.JokerApp.props",
+      "PackagePath": "buildTransitive\\JokerApp.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

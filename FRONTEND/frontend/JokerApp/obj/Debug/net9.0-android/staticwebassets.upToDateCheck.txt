@@ -1,0 +1,8 @@
+wwwroot\css\app.css
+wwwroot\css\bootstrap\bootstrap.min.css
+wwwroot\css\bootstrap\bootstrap.min.css.map
+wwwroot\index.html
+D:\Programowanie\Projekty\Front\FRONTEND\frontend\JokerApp\wwwroot\css\app.css
+D:\Programowanie\Projekty\Front\FRONTEND\frontend\JokerApp\wwwroot\css\bootstrap\bootstrap.min.css
+D:\Programowanie\Projekty\Front\FRONTEND\frontend\JokerApp\wwwroot\css\bootstrap\bootstrap.min.css.map
+D:\Programowanie\Projekty\Front\FRONTEND\frontend\JokerApp\wwwroot\index.html
