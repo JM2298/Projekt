@@ -1,0 +1,1 @@
+default_app_config = 'joker_chat.apps.JokerChatConfig'
