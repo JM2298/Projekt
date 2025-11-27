@@ -1,0 +1,25 @@
+<svg width="865" height="512" viewBox="0 0 865 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mapa podglądowa">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#0b1120" />
+    </linearGradient>
+    <linearGradient id="grid" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.25" />
+    </linearGradient>
+  </defs>
+  <rect width="865" height="512" fill="url(#bg)" />
+  <g stroke="url(#grid)" stroke-width="1">
+    <path d="M0 64h865M0 128h865M0 192h865M0 256h865M0 320h865M0 384h865M0 448h865" opacity="0.25" />
+    <path d="M72 0v512M144 0v512M216 0v512M288 0v512M360 0v512M432 0v512M504 0v512M576 0v512M648 0v512M720 0v512M792 0v512" opacity="0.25" />
+  </g>
+  <circle cx="210" cy="180" r="10" fill="#22d3ee" opacity="0.6" />
+  <circle cx="420" cy="220" r="12" fill="#a855f7" opacity="0.6" />
+  <circle cx="640" cy="150" r="11" fill="#22c55e" opacity="0.6" />
+  <circle cx="560" cy="340" r="10" fill="#fb7185" opacity="0.6" />
+  <circle cx="300" cy="340" r="9" fill="#f97316" opacity="0.6" />
+  <text x="72" y="72" fill="#cbd5e1" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" opacity="0.9">
+    Podgląd mapy niedostępny — wyświetlono obraz zastępczy
+  </text>
+</svg>
