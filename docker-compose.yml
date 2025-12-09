@@ -1,103 +1,154 @@
-volumes:
-  postgres_data:
-  static_volume:   # <-- tu nic się nie zmienia, ale NAZWA będzie teraz faktycznie użyta
-
-networks:
-  webnet:
+version: '3.8'
 
 services:
-  db:
-    image: postgis/postgis:15-3.3
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: gis
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 15s
-      retries: 5
-    ports:
-      - "5432:5432"
-    networks:
-      - webnet
-
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-
-    working_dir: /code/BACKEND/django/joker_projekt  # ustawiamy katalog projektu Django
-    # ➜ uruchamiamy collectstatic przed Gunicorn-em
-    command:
-      - sh
-      - -c
-      - |
-        python manage.py collectstatic --noinput &&
-          exec uvicorn joker_projekt.asgi:application \
-            --host 0.0.0.0 \
-            --port 8000 \
-            --ws websockets \
-            --reload
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: gis
-      POSTGRES_HOST: db
-      POSTGRES_PORT: "5432"
-
-    volumes:
-      - .:/code:rw                         # kod źródłowy
-      - ./BACKEND/django/joker_projekt/static:/static  # pliki statyczne trafiają tu
-      - ./media:/code/BACKEND/django/joker_projekt/media  # uploady trafiają do katalogu media
-    ports:
-      - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
-      interval: 30s
-      retries: 3
-    restart: always
-    networks:
-      - webnet
-
-  nginx:
-    image: nginx:alpine
-    depends_on:
-      - web
-    ports:
-      - "80:80"
-      #- "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      # - ./certs:/etc/nginx/certs:ro
-      - ./BACKEND/django/joker_projekt/static:/static:ro
-      - ./media:/code/django/joker_projekt/media:ro  # <-- montujemy katalog media
-    networks:
-      - webnet
-
   redis:
-    image: "redis:alpine"
+    image: redis:latest
     ports:
       - "6379:6379"
-    networks:
-      - webnet
-
-  react:
-    image: node:18-alpine
-    working_dir: /app
-    command: sh -c "npm install && npm start"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 256M
     volumes:
-      - ./FRONTEND/frontend:/app
-      - /app/node_modules
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    ports:
-      - "3000:3000"
-    depends_on:
-      - web
+      - cache_data:/data
     networks:
-      - webnet
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 3
+
+  db:
+    image: imresamu/postgis:16-3.4.4-alpine3.22
+    # platform is not supported in swarm stack files; ensure the image you use matches your node architecture
+    environment:
+      POSTGRES_DB_FILE: /run/secrets/db_name
+      POSTGRES_USER_FILE: /run/secrets/db_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_name
+      - db_user
+      - db_password
+    ports:
+      - "5432:5432"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/db_user) -d $$(cat /run/secrets/db_name)"]
+      interval: 10s
+      retries: 5
+
+  backend:
+    image: ghcr.io/schizzzo/joker_czat_swarm_backend:latest
+    user: "www-data"
+
+    environment:
+      DEBUG: "False"
+      REDIS_URL: redis://redis:6379/0
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      
+
+    secrets:
+      - secret_key
+      - db_name
+      - db_user
+      - db_password
+      - cors_allowed_origin
+      - allowed_hosts
+      - admin_username
+      - admin_email
+      - admin_password
+
+    ports:
+      - "8000:8000"
+
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 320M
+      restart_policy:
+        condition: on-failure
+
+    working_dir: /code/django/joker_projekt
+
+    command:
+      - uvicorn
+      - joker_projekt.asgi:application
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --ws
+      - websockets
+
+    volumes:
+      # STATIC_ROOT = /code/django/joker_projekt/static
+      - static_volume:/code/django/joker_projekt/static
+      # MEDIA_ROOT = /code/media
+      - media_volume:/code/media:rw
+
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - redis
+
+  nginx:
+    image: ghcr.io/schizzzo/joker_czat_swarm_frontend:latest
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - static_volume:/code/django/joker_projekt/static
+      - media_volume:/code/media
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+  cache_data:
+
+secrets:
+  db_password:
+    external: true
+  secret_key:
+    external: true
+  db_name:
+    external: true
+  db_user:
+    external: true
+  cors_allowed_origin:
+    external: true
+  allowed_hosts:
+    external: true
+  admin_username:
+    external: true
+  admin_email:
+    external: true
+  admin_password:
+    external: true
+
+networks:
+  app-network:
+    driver: overlay
